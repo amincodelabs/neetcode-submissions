@@ -1,0 +1,43 @@
+class Solution {
+public:
+    int minCostConnectPoints(vector<vector<int>>& points) {
+        int n = points.size();
+        unordered_map<int, vector<pair<int, int>>> adj;
+        for(int i = 0; i < n; i++) {
+            int x1 = points[i][0];
+            int y1 = points[i][1];
+            for(int j = i + 1; j < n; j++) {
+                int x2 = points[j][0];
+                int y2 = points[j][1];
+                int dist = abs(x1 - x2) + abs(y1 - y2);
+                adj[i].push_back({dist, j});
+                adj[j].push_back({dist, i});
+            }
+        }
+
+        int result = 0;
+        unordered_set<int> visited;
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> minHeap;
+        minHeap.push({0, 0});
+        
+        while(visited.size() < n) {
+            auto current = minHeap.top();
+            minHeap.pop();
+            int cost = current.first;
+            int i = current.second;
+            if(visited.count(i)) {
+                continue;
+            }
+            result += cost;
+            visited.insert(i);
+            for(const auto& nei : adj[i]) {
+                int neiCost = nei.first;
+                int neiIndex = nei.second;
+                if(!visited.count(neiIndex)) {
+                    minHeap.push({neiCost, neiIndex});
+                }
+            }
+        }
+        return result;
+    }
+};
